@@ -24,7 +24,6 @@ class Posts extends React.Component {
     }
 
     render() {
-        console.log(this.props.user)
         return(
             <View>
                 <Text>Posts</Text>

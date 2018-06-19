@@ -42,11 +42,23 @@ export function checkUser() {
 
 export function signIn(phoneNumber) {
     return (dispatch) => {
+        console.log(phoneNumber)
         firebase.auth().signInWithPhoneNumber(phoneNumber)
+            .then((result) => {
+                const codeInput = "111111" // Temp value
+                
+                if (result && codeInput.length) {
+                    result.confirm(codeInput)
+                        .catch((error) => {
+                            const { code, message } = error;
+                            console.log(message)
+                        })
+                }
+            })
             .catch((error) => {
                 const { code, message } = error;
                 console.log(message)
-            });
+            })
     }
 }
 
