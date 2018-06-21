@@ -20,3 +20,7 @@ export const noteText = '#a9a9a9'
 
 // Title Color
 export const appTitle = '#3B3C36'
+
+// Post Feed Colors
+export const divider = '#a9a9a9'
+export const postPressed = '#a9a9a9'

@@ -3,21 +3,23 @@ import { sendMessage } from '../actions/authActions';
 import { View, Text, TextInput, Button } from "react-native"
 import { connect } from 'react-redux'
 
-function renderMessages(comments) {
+function renderMessages(posts, postId) {
     let array = []
-    for (let key in comments) {
-        if (comments.hasOwnProperty(key)) {
-            array.push(comments[key])
+    let post = posts[postId]
+    
+    if(postId != undefined) {
+        if(post.comments) {
+            for (let key in post.comments) {
+                if (post.comments.hasOwnProperty(key)) {
+                    array.push(post.comments[key])
+                }
+            }
         }
     }
     return array
 }
 
 class Comments extends React.Component {
-    submitMessage() {
-        this.props.onSendMessage(this.props.user.uid, this.props.navigation.state.params.postObj.postId, this.state.message)
-    }
-
     constructor(props) {
         super(props)
         this.state = {
@@ -25,25 +27,29 @@ class Comments extends React.Component {
         }
         this.submitMessage = this.submitMessage.bind(this)
     }
+
+    submitMessage() {
+        this.props.onSendMessage(this.props.user.uid, this.props.navigation.state.params.postObj.postId, this.state.message)
+    }
+    
     render() {
         let mark = this.props.navigation.state.params.postObj
         return (
             <View>
-                <Text>Post{"\n"}</Text>
-                <Text>{mark.title}{"\n"}</Text>
-                <Text>{mark.content}{"\n"}</Text>
                 <TextInput onChangeText={(message) => this.setState({ message })}></TextInput>
-                {
-                    renderMessages(this.props.posts[mark.postId].comments).map(obj =>
-                        <View>
-                            <Text>{obj.comment}{"\n"}</Text>
-                        </View>
-                    )
-                }
                 <Button
                     onPress={this.submitMessage}
                     title={"Submit"}
                 />
+                <Text>{mark.title}{"\n"}</Text>
+                <Text>{mark.content}{"\n"}</Text>
+                {
+                    renderMessages(this.props.posts, mark.postId).map((obj,i) =>
+                        <View key={`comment_${i}`}>
+                            <Text>{obj.comment}{"\n"}</Text>
+                        </View>
+                    )
+                }
             </View>
         )
     }
