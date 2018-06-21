@@ -2,9 +2,9 @@ import React from 'react';
 import { Dimensions, Image, TextInput } from 'react-native';
 import { signIn } from '../actions/authActions';
 import { connect } from 'react-redux'
-import glamorous from "glamorous-native"
+import glamorous from 'glamorous-native'
 
-import { appBackground, appTitle, secondary, secondaryDark, primaryDark, noteText } from '../assets/styles/colors'
+import { appBackground, appTitle, secondary, secondaryDark, noteText } from '../assets/styles/colors'
 
 class Login extends React.Component {
     constructor(props) {
@@ -18,7 +18,7 @@ class Login extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.user != null) {
-            this.props.screenProps.rootNavigation.navigate("Posts")
+            this.props.screenProps.rootNavigation.navigate("PostNavigator")
         }
         else {
             this.props.screenProps.rootNavigation.navigate("Login")
@@ -83,7 +83,7 @@ const PhoneInputText = glamorous.text({
     color: noteText
 })
 
-const PhoneInputView = glamorous.textInput({
+const PhoneInputView = glamorous.view({
     width: "95%",
     borderWidth: 3,
     borderColor: secondary,

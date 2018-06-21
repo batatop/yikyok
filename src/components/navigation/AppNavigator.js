@@ -1,15 +1,25 @@
 import React from 'react';
 import { YellowBox } from 'react-native';
-import { createDrawerNavigator } from 'react-navigation';
+import { createDrawerNavigator, createStackNavigator } from 'react-navigation';
 import { connect } from 'react-redux'
 
 import { checkUser } from "../../actions/authActions"
+import Comments from '../Comments'
 import Login from '../Login'
+import NewPost from '../NewPost'
 import Posts from '../Posts'
 import StartApp from '../StartApp'
 
 // Temporarily disable isMounted warning - delete it after react-native is fixed
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
+
+const PostNavigator = createStackNavigator(
+    {
+        Posts: { screen: Posts },
+        NewPost: { screen: NewPost },
+        Comments: { screen: Comments }
+    }
+)
 
 const RootNavigator = createDrawerNavigator(
     {
@@ -29,9 +39,9 @@ const RootNavigator = createDrawerNavigator(
                     }}
                 />
         },
-        Posts: {
+        PostNavigator: {
             screen: ({ navigation }) =>
-                <Posts
+                <PostNavigator
                     screenProps={{
                         rootNavigation: navigation
                     }}

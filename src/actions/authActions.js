@@ -29,6 +29,13 @@ export function checkUser() {
                         console.log(message)
                     });
                 });
+                let postRef = db.ref(`posts/`);
+                postRef.on('value', (snapshot) => {
+                    dispatch({
+                        type: "POST_GET_POST",
+                        payload: snapshot.val()
+                    })
+                });
             }
             else {
                 dispatch({
@@ -42,7 +49,6 @@ export function checkUser() {
 
 export function signIn(phoneNumber) {
     return (dispatch) => {
-        console.log(phoneNumber)
         firebase.auth().signInWithPhoneNumber(phoneNumber)
             .then((result) => {
                 const codeInput = "111111" // Temp value
@@ -73,5 +79,32 @@ export function signOut(uid) {
                 const { code, message } = error;
                 console.log(message)
             });
+    }
+}
+
+export function makePost(post) {
+    return (dispatch) => {
+        let postsRef = db.ref(`posts`)
+        let postKey = postsRef.push().key
+
+        postsRef.child(postKey).set({
+            postId: postKey,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            title: post.title,
+            content: post.content,
+        })
+    }
+}
+
+export function sendMessage(userId, post, message) {
+    return (dispatch) => {
+        let commentsRef = db.ref(`posts/${post}/comments`)
+        let commentKey = commentsRef.push().key
+
+        commentsRef.child(commentKey).set({
+            commentId: commentKey,
+            comment: message,
+            user: userId,
+        })
     }
 }

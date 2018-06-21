@@ -8,7 +8,7 @@ class StartApp extends React.Component {
         super(props)
         if (this.props.user != "noUser") {
             if (this.props.user != null) {
-                this.props.screenProps.rootNavigation.navigate("Posts")
+                this.props.screenProps.rootNavigation.navigate("PostNavigator")
             }
             else {
                 this.props.screenProps.rootNavigation.navigate("Login")
@@ -19,7 +19,7 @@ class StartApp extends React.Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.user != "noUser") {
             if (nextProps.user != null) {
-                this.props.screenProps.rootNavigation.navigate("Posts")
+                this.props.screenProps.rootNavigation.navigate("PostNavigator")
             }
             else {
                 this.props.screenProps.rootNavigation.navigate("Login")
