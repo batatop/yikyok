@@ -8,6 +8,7 @@ import Comments from '../Comments'
 import Login from '../Login'
 import NewPost from '../NewPost'
 import Posts from '../Posts'
+import Profile from '../Profile';
 import StartApp from '../StartApp'
 
 // Temporarily disable isMounted warning - delete it after react-native is fixed
@@ -16,8 +17,9 @@ YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTIm
 const PostNavigator = createStackNavigator(
     {
         Posts: { screen: Posts },
+        Comments: { screen: Comments },
         NewPost: { screen: NewPost },
-        Comments: { screen: Comments }
+        Profile: { screen: Profile }
     }
 )
 

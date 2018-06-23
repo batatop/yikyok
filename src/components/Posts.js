@@ -1,10 +1,10 @@
 import React from "react"
-import { View, Text, TouchableHighlight, Dimensions, Image } from "react-native"
-import { signOut } from '../actions/authActions';
+import { View, Text, TouchableHighlight, Dimensions, Image, ScrollView } from "react-native"
 import { connect } from 'react-redux'
 import glamorous from 'glamorous-native'
 
-import { appBackground, secondary, secondaryDark, darkText, divider, postPressed } from "../assets/styles/colors"
+import { appBackground, secondary, secondaryDark, darkText, divider, postPressed, lightText } from "../assets/styles/colors"
+import { newPostButtonSize, newPostButtonPadding, postFontSize, postPadding, postMinHeight, postBorderWidth } from "../assets/styles/sizes";
 
 function renderPosts(posts) {
     let array = []
@@ -13,14 +13,32 @@ function renderPosts(posts) {
             array.push(posts[key])
         }
     }
-    return array
 
+    return array
 }
 
 class Posts extends React.Component {
+    static navigationOptions = ({ screenProps, navigation }) => ({
+        title: "Posts",
+        headerStyle: {
+            backgroundColor: secondary
+        },
+        headerTitleStyle: {
+            color: lightText
+        },
+        headerRight: (
+            <IconContainerView>
+                <HeaderIconButton
+                    onPress={() => navigation.navigate("Profile")}
+                >
+                    <Image source={require("../assets/icons/profileIcon.png")} />
+                </HeaderIconButton>
+            </IconContainerView>
+        )
+    });
+
     constructor(props) {
         super(props)
-        this.onSignOutPressed = this.onSignOutPressed.bind(this)
         this.onNewPost = this.onNewPost.bind(this)
         this.openPost = this.openPost.bind(this)
     }
@@ -42,71 +60,85 @@ class Posts extends React.Component {
         }
     }
 
-    onSignOutPressed() {
-        this.props.onSignOut(this.props.user.uid)
-    }
-
     render() {
         return (
             <PostsView>
-                <View>
-                    {
-                        renderPosts(this.props.posts).map((post, i) => {
-                            return (
-                                <PostButton
-                                    key={`post_${i}`}
-                                    onPress={() => this.openPost(post)}
-                                    underlayColor={postPressed}
-                                >
-                                    <PostView>
-                                        <PostIndicatorView/>
-                                        <PostContentView>
-                                            <TitleText>{post.title} </TitleText>
-                                            <ContentText>{post.content}</ContentText>
-                                            {/* <Text>{post.timestamp}{"\n"}</Text> */}
-                                        </PostContentView>
-                                    </PostView>
-                                </PostButton>
-                            )
-                        })
-                    }
-                </View>
+                <ScrollView>
+                    <View>
+                        {
+                            renderPosts(this.props.posts).map((post, i) => {
+                                return (
+                                    <PostButton
+                                        key={`post_${i}`}
+                                        onPress={() => this.openPost(post)}
+                                        underlayColor={postPressed}
+                                    >
+                                        <PostView>
+                                            <PostIndicatorView/>
+                                            <PostContentView>
+                                                <TitleText>{post.title} </TitleText>
+                                                <ContentText>{post.content}</ContentText>
+                                                {/* <Text>{post.timestamp}{"\n"}</Text> */}
+                                            </PostContentView>
+                                        </PostView>
+                                    </PostButton>
+                                )
+                            })
+                        }
+                    </View>
+                    <ButtonEmptyView>
+
+                    </ButtonEmptyView>
+                </ScrollView>
                 <NewPostButton
                     onPress={() => this.onNewPost()}
-                    underlayColor= {secondaryDark}
+                    underlayColor={secondaryDark}
                 >
                     <Image
                         source={require('../assets/icons/addPostIcon.png')}
                     />
                 </NewPostButton>
-                <TouchableHighlight onPress={this.onSignOutPressed}><Text>Sign Out</Text></TouchableHighlight>
             </PostsView>
         );
     }
 }
 
+const ButtonEmptyView = glamorous.view({
+    height: newPostButtonSize + (2 * newPostButtonPadding)
+})
+
 const ContentText = glamorous.text({
     color: darkText,
-    fontSize: 15,
-    paddingLeft: 20,
-    paddingRight: 20
+    fontSize: postFontSize,
+    paddingLeft: postPadding,
+    paddingRight: postPadding
+})
+
+const IconContainerView = glamorous.view({
+    flexDirection: "row",
+    flex: 1,
+})
+
+const HeaderIconButton = glamorous.touchableHighlight({
+    // marginRight: 18,
+    padding: 18
 })
 
 const NewPostButton = glamorous.touchableHighlight({
     position: 'absolute',
-    bottom: 35,
-    right: 35,
+    bottom: newPostButtonPadding,
+    right: newPostButtonPadding,
     backgroundColor: secondary,
-    height: 75,
-    width: 75,
+    height: newPostButtonSize,
+    width: newPostButtonSize,
     borderRadius: Dimensions.get("window").width,
     justifyContent: 'center',
     alignItems: 'center'
 })
 
 const PostButton = glamorous.touchableHighlight({
-    minHeight: 80,
-    borderBottomWidth: 1,
+    minHeight: postMinHeight,
+    borderBottomWidth: postBorderWidth,
     borderBottomColor: divider,
 })
 
@@ -117,7 +149,7 @@ const PostContentView = glamorous.view({
 const PostIndicatorView = glamorous.view({
     backgroundColor: secondary,
     height: "90%",
-    width: 10
+    width: 5
 })
 
 const PostView = glamorous.view({
@@ -147,8 +179,4 @@ const mapStateToProps = (state) => {
     })
 };
 
-const mapActionsToProps = {
-    onSignOut: signOut
-}
-
-export default connect(mapStateToProps, mapActionsToProps)(Posts);
+export default connect(mapStateToProps)(Posts);
