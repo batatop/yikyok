@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import glamorous from 'glamorous-native'
 
 import { appBackground, appTitle, secondary, secondaryDark, noteText } from '../assets/styles/colors'
+import { noteFontSize, titleTextSize, inputBorderWidth, inputBorderRadius, inputPaddingSides, loginSubmitPadding } from '../assets/styles/sizes';
 
 class Login extends React.Component {
     constructor(props) {
@@ -39,7 +40,6 @@ class Login extends React.Component {
                     <PhoneInputText>Enter your phone number</PhoneInputText>
                     <PhoneInputView>
                         <TextInput
-                            style={{ borderColor: 'black', borderWidth: 1 }}
                             onChangeText={(text) => this.setState({ text })}
                             value={this.state.text}
                         />
@@ -68,7 +68,7 @@ const PostsView = glamorous.view({
 
 const TitleText = glamorous.text({
     color: appTitle,
-    fontSize: 45,
+    fontSize: titleTextSize,
     fontWeight: 'bold',
     top: '50%'
 })
@@ -79,28 +79,26 @@ const TitleView = glamorous.view({
 })
 
 const PhoneInputText = glamorous.text({
-    width: "95%",
-    color: noteText
+    color: noteText,
+    fontSize: noteFontSize
 })
 
 const PhoneInputView = glamorous.view({
-    width: "95%",
-    borderWidth: 3,
+    borderWidth: inputBorderWidth,
     borderColor: secondary,
-    borderRadius: 6
+    borderRadius: inputBorderRadius
 })
 
 const PhoneView = glamorous.view({
     flex: 0.2,
-    justifyContent: 'center',
-    alignItems: 'center'
+    paddingLeft: inputPaddingSides,
+    paddingRight: inputPaddingSides
 })
 
 const SubmitButton = glamorous.touchableHighlight({
-    top: "5%",
     backgroundColor: secondary,
     borderRadius: Dimensions.get("window").width,
-    padding: 10
+    padding: loginSubmitPadding
 })
 
 const SubmitView = glamorous.view({

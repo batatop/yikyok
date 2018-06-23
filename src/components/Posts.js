@@ -1,5 +1,5 @@
 import React from "react"
-import { View, Text, TouchableHighlight, Dimensions, Image, ScrollView } from "react-native"
+import { View, Dimensions, Image, ScrollView } from "react-native"
 import { connect } from 'react-redux'
 import glamorous from 'glamorous-native'
 
@@ -24,6 +24,7 @@ class Posts extends React.Component {
             backgroundColor: secondary
         },
         headerTitleStyle: {
+            width: Dimensions.get('window').width,
             color: lightText
         },
         headerRight: (
@@ -120,7 +121,6 @@ const IconContainerView = glamorous.view({
 })
 
 const HeaderIconButton = glamorous.touchableHighlight({
-    // marginRight: 18,
     padding: 18
 })
 
