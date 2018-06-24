@@ -4,12 +4,12 @@ import { createDrawerNavigator, createStackNavigator } from 'react-navigation';
 import { connect } from 'react-redux'
 
 import { checkUser } from "../../actions/authActions"
-import Comments from '../Comments'
-import Login from '../Login'
-import NewPost from '../NewPost'
-import Posts from '../Posts'
-import Profile from '../Profile';
-import StartApp from '../StartApp'
+import Comments from '../smart/Comments'
+import Login from '../smart/Login'
+import NewPost from '../smart/NewPost'
+import Posts from '../smart/Posts'
+import Profile from '../smart/Profile';
+import StartApp from '../smart/StartApp'
 
 // Temporarily disable isMounted warning - delete it after react-native is fixed
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);

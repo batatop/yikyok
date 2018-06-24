@@ -1,11 +1,11 @@
 import React from "react"
-import { makePost } from '../actions/authActions';
-import { View, TextInput, Image, Dimensions, Text } from "react-native"
+import { makePost } from '../../actions/authActions';
+import { TextInput, Image, Dimensions, Text } from "react-native"
 import { connect } from 'react-redux'
 import glamorous from 'glamorous-native'
 
-import { secondary, lightText, noteText, secondaryDark, appBackground } from "../assets/styles/colors";
-import { noteFontSize, inputBorderWidth, inputBorderRadius, inputPaddingSides, newPostSubmitFontSize, newPostSubmitSize, newPostSubmitBottomPadding, noteTopMargin } from "../assets/styles/sizes";
+import { secondary, lightText, noteText, secondaryDark, appBackground, headerSelected } from "../../assets/styles/colors";
+import { noteFontSize, inputBorderWidth, inputBorderRadius, inputPaddingSides, newPostSubmitFontSize, newPostSubmitSize, newPostSubmitBottomPadding, noteTopMargin } from "../../assets/styles/sizes";
 
 class NewPost extends React.Component {
     static navigationOptions = ({ screenProps, navigation }) => ({
@@ -21,8 +21,9 @@ class NewPost extends React.Component {
             <IconContainerView>
                 <HeaderIconButton
                     onPress={() => navigation.navigate("Profile")}
+                    underlayColor={headerSelected}
                 >
-                    <Image source={require("../assets/icons/profileIcon.png")} />
+                    <Image source={require("../../assets/icons/profileIcon.png")} />
                 </HeaderIconButton>
             </IconContainerView>
         )

@@ -1,5 +1,5 @@
 import glamorous from 'glamorous-native'
-import { appTitle, secondaryLight } from '../assets/styles/colors'
+import { appTitle, secondaryLight } from '../../assets/styles/colors'
 import React from 'react'
 import { Animated } from 'react-native'
 

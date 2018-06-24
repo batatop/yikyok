@@ -1,11 +1,11 @@
 import React from 'react';
 import { Dimensions, Image, TextInput } from 'react-native';
-import { signIn } from '../actions/authActions';
+import { signIn } from '../../actions/authActions';
 import { connect } from 'react-redux'
 import glamorous from 'glamorous-native'
 
-import { appBackground, appTitle, secondary, secondaryDark, noteText } from '../assets/styles/colors'
-import { noteFontSize, titleTextSize, inputBorderWidth, inputBorderRadius, inputPaddingSides, loginSubmitPadding } from '../assets/styles/sizes';
+import { appBackground, appTitle, secondary, secondaryDark, noteText } from '../../assets/styles/colors'
+import { noteFontSize, titleTextSize, inputBorderWidth, inputBorderRadius, inputPaddingSides, loginSubmitPadding } from '../../assets/styles/sizes';
 
 class Login extends React.Component {
     constructor(props) {
@@ -51,7 +51,7 @@ class Login extends React.Component {
                         underlayColor={secondaryDark}
                     >
                         <Image
-                            source={ require('../assets/icons/signInIcon.png') }
+                            source={ require('../../assets/icons/signInIcon.png') }
                         />
                     </SubmitButton>
                 </SubmitView>

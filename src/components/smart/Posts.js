@@ -3,8 +3,8 @@ import { View, Dimensions, Image, ScrollView } from "react-native"
 import { connect } from 'react-redux'
 import glamorous from 'glamorous-native'
 
-import { appBackground, secondary, secondaryDark, darkText, divider, postPressed, lightText } from "../assets/styles/colors"
-import { newPostButtonSize, newPostButtonPadding, postFontSize, postPadding, postMinHeight, postBorderWidth } from "../assets/styles/sizes";
+import { appBackground, secondary, secondaryDark, darkText, divider, postPressed, lightText, headerSelected } from "../../assets/styles/colors"
+import { newPostButtonSize, newPostButtonPadding, postFontSize, postPadding, postMinHeight, postBorderWidth } from "../../assets/styles/sizes";
 
 function renderPosts(posts) {
     let array = []
@@ -24,15 +24,16 @@ class Posts extends React.Component {
             backgroundColor: secondary
         },
         headerTitleStyle: {
-            width: Dimensions.get('window').width,
-            color: lightText
+            width: Dimensions.get('window').width
         },
+        headerTintColor: lightText,
         headerRight: (
             <IconContainerView>
                 <HeaderIconButton
                     onPress={() => navigation.navigate("Profile")}
+                    underlayColor={headerSelected}
                 >
-                    <Image source={require("../assets/icons/profileIcon.png")} />
+                    <Image source={require("../../assets/icons/profileIcon.png")} />
                 </HeaderIconButton>
             </IconContainerView>
         )
@@ -87,16 +88,14 @@ class Posts extends React.Component {
                             })
                         }
                     </View>
-                    <ButtonEmptyView>
-
-                    </ButtonEmptyView>
+                    <ButtonEmptyView/>
                 </ScrollView>
                 <NewPostButton
                     onPress={() => this.onNewPost()}
                     underlayColor={secondaryDark}
                 >
                     <Image
-                        source={require('../assets/icons/addPostIcon.png')}
+                        source={require('../../assets/icons/addPostIcon.png')}
                     />
                 </NewPostButton>
             </PostsView>

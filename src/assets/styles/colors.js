@@ -24,3 +24,6 @@ export const appTitle = '#3B3C36'
 // Post Content
 export const divider = '#e5e1e1'
 export const postPressed = '#e5e1e1'
+
+// Header Color
+export const headerSelected = '#811312'
