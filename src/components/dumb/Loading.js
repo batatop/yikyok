@@ -23,7 +23,7 @@ export default class FadeInView extends React.Component {
     render() {
         return (
             <LoadingView style={{ opacity: this.state.fade}}>
-                <LoadingText>Yikyok </LoadingText>
+                <LoadingText>New Yikyak  </LoadingText>
             </LoadingView>
         );
     }
@@ -84,7 +84,7 @@ const LoadingView = AnimatedView({
 //     render() {
 //         return (
 //             <Animated.LoadingView>
-//                 <LoadingText>Yikyok </LoadingText>
+//                 <LoadingText>New Yikyak  </LoadingText>
 //             </Animated.LoadingView>
 //         );
 //     }

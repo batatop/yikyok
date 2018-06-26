@@ -1,10 +1,10 @@
 import React from "react"
-import { sendMessage } from '../../actions/authActions';
+import { sendMessage, votePost } from '../../actions/authActions';
 import { Text, Dimensions, Image, ScrollView, View, TouchableHighlight } from "react-native"
 import { connect } from 'react-redux'
 import glamorous from 'glamorous-native'
 
-import { secondary, lightText, darkText, divider, appBackground, secondaryDark, secondaryLight, headerSelected, noteText, primaryLight } from "../../assets/styles/colors";
+import { secondary, lightText, darkText, divider, appBackground, secondaryDark, secondaryLight, headerSelected, noteText, primary, postPressed } from "../../assets/styles/colors";
 import { postFontSize, postPadding, postMinHeight, postBorderWidth, singleCommentHeight, sendIconSize, sendIconBorderSize, postIndicatorWidth, singleCommentIndicatorWidth, commentsTextPaddingTop, contentsPaddingSides, inputHeight, iconPadding, commentsInputPaddingSides, inputTextboxBorderRadius, inputTextboxHeight, sendIconPadding, noteFontSize } from "../../assets/styles/sizes";
 
 function renderMessages(posts, postId) {
@@ -79,11 +79,20 @@ class Comments extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            message: ''
+            message: '',
+            post: this.props.navigation.state.params.postObj
         }
         this.listMessages = this.listMessages.bind(this)
         this.submitMessage = this.submitMessage.bind(this)
         this.vote = this.vote.bind(this)
+        this.setVoteButtonColor = this.setVoteButtonColor.bind(this)
+    }
+
+    componentWillReceiveProps(nextProps) {
+        let postId = nextProps.navigation.state.params.postObj.postId
+        this.setState({
+            post: nextProps.posts[postId]
+        })
     }
 
     listMessages(posts, postId) {
@@ -99,28 +108,31 @@ class Comments extends React.Component {
     }
 
     submitMessage() {
-        this.props.onSendMessage(this.props.user.uid, this.props.navigation.state.params.postObj.postId, this.state.message)
+        this.props.onSendMessage(this.props.user.uid, this.state.post.postId, this.state.message)
     }
 
-    vote(num) {
-        // let pid = this.props.navigation.state.params.postObj.postId
-        // let upvoted
-        // if (this.props.user.votes && this.props.user.votes[pid])
-        //     upvoted = this.props.user.votes[pid].vote
+    vote(vote) {
+        let pid = this.state.post.postId
+        this.props.onVote(pid, this.props.user.uid, vote)
+    }
 
-        // let voteState = 0
+    setVoteButtonColor(pid, reaction) {
+        if (reaction == "like") {
+            if (this.props.user && this.props.user.votes && this.props.user.votes[pid] && this.props.user.votes[pid].vote == 1) {
+                return secondaryLight
+            }
+        }
+        else if (reaction == "dislike") {
+            if (this.props.user && this.props.user.votes && this.props.user.votes[pid] && this.props.user.votes[pid].vote == -1) {
+                return secondaryLight
+            }
+        }
 
-        // if (upvoted != undefined) {
-        //     if (!(upvoted === num)) {
-        //         voteState = num
-        //     }
-        // }
-
-        // this.props.onVote(this.props.navigation.state.params.postObj.postId, this.props.user.uid, voteState)
+        return primary
     }
     
     render() {
-        let mark = this.props.navigation.state.params.postObj
+        let mark = this.state.post
         return (
             <CommentsView>
                 <ScrollView>
@@ -130,12 +142,31 @@ class Comments extends React.Component {
                             <TitleText>{mark.title}</TitleText>
                             <ContentText>{mark.content}</ContentText>
                             <FooterView>
-                                <VoteButton
-                                    onPress={() => this.vote(1)}
-                                    underlayColor={headerSelected}
-                                >
-                                    <VoteImage source={require("../../assets/icons/upIcon.png")} />
-                                </VoteButton>
+                                <VoteView>
+                                    <VoteButton
+                                        onPress={() => this.vote(1)}
+                                        underlayColor={postPressed}
+                                    >
+                                        <Image
+                                            source={require("../../assets/icons/upIcon.png")}
+                                            style={{
+                                                tintColor: this.setVoteButtonColor(mark.postId, "like")
+                                            }}
+                                        />
+                                    </VoteButton>
+                                    <VoteText>{mark.vote}   </VoteText>
+                                    <VoteButton
+                                        onPress={() => this.vote(-1)}
+                                        underlayColor={postPressed}
+                                    >
+                                        <Image
+                                            source={require("../../assets/icons/downIcon.png")}
+                                            style={{
+                                                tintColor: this.setVoteButtonColor(mark.postId, "dislike")
+                                            }}
+                                        />
+                                    </VoteButton>
+                                </VoteView>
                                 <DateText>{dateConvert(mark.timestamp)}</DateText>
                             </FooterView>
                         </PostContentView>
@@ -311,11 +342,18 @@ const TextboxSide = glamorous.view({
 })
 
 const VoteButton = glamorous.touchableHighlight({
+    padding: contentsPaddingSides
+})
+
+const VoteText = glamorous.text({
+    fontWeight: 'bold',
     paddingLeft: contentsPaddingSides
 })
 
-const VoteImage = glamorous.image({
-    tintColor: primaryLight
+const VoteView = glamorous.view({
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
 })
 
 const mapStateToProps = (state) => {
@@ -326,7 +364,8 @@ const mapStateToProps = (state) => {
 };
 
 const mapActionsToProps = {
-    onSendMessage: sendMessage
+    onSendMessage: sendMessage,
+    onVote: votePost
 }
 
 export default connect(mapStateToProps, mapActionsToProps)(Comments);

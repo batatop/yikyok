@@ -3,8 +3,9 @@ import { View, Dimensions, Image, ScrollView } from "react-native"
 import { connect } from 'react-redux'
 import glamorous from 'glamorous-native'
 
-import { appBackground, secondary, secondaryDark, darkText, divider, postPressed, lightText, headerSelected, noteText } from "../../assets/styles/colors"
+import { appBackground, secondary, secondaryDark, darkText, divider, postPressed, lightText, headerSelected, noteText, secondaryLight, primary } from "../../assets/styles/colors"
 import { newPostButtonSize, newPostButtonPadding, postFontSize, postPadding, postMinHeight, postBorderWidth, postIndicatorWidth, contentsPaddingSides, noteFontSize } from "../../assets/styles/sizes";
+import { votePost } from "../../actions/authActions";
 
 function renderPosts(posts) {
     let array = []
@@ -75,6 +76,17 @@ class Posts extends React.Component {
         super(props)
         this.onNewPost = this.onNewPost.bind(this)
         this.openPost = this.openPost.bind(this)
+        this.setVoteButtonColor = this.setVoteButtonColor.bind(this)
+        this.vote = this.vote.bind(this)
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.user != null) {
+            this.props.screenProps.rootNavigation.navigate("PostNavigator")
+        }
+        else {
+            this.props.screenProps.rootNavigation.navigate("Login")
+        }
     }
 
     onNewPost() {
@@ -85,13 +97,24 @@ class Posts extends React.Component {
         this.props.navigation.navigate("Comments", { postObj })
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.user != null) {
-            this.props.screenProps.rootNavigation.navigate("PostNavigator")
+    setVoteButtonColor(pid, reaction) {
+        if (reaction == "like") {
+            if (this.props.user && this.props.user.votes && this.props.user.votes[pid] && this.props.user.votes[pid].vote == 1) {
+                return secondaryLight
+            }
         }
-        else {
-            this.props.screenProps.rootNavigation.navigate("Login")
+        else if (reaction == "dislike") {
+            if (this.props.user && this.props.user.votes && this.props.user.votes[pid] && this.props.user.votes[pid].vote == -1) {
+                return secondaryLight
+            }
         }
+
+        return primary
+    }
+
+    vote(post, vote) {
+        let pid = post.postId
+        this.props.onVote(pid, this.props.user.uid, vote)
     }
 
     render() {
@@ -108,11 +131,38 @@ class Posts extends React.Component {
                                         underlayColor={postPressed}
                                     >
                                         <PostView>
-                                            <PostIndicatorView/>
+                                            <PostIndicatorView />
                                             <PostContentView>
-                                                <TitleText>{post.title} </TitleText>
+                                                <TitleText>{post.title}</TitleText>
                                                 <ContentText>{post.content}</ContentText>
-                                                <DateText>{dateConvert(post.timestamp)}</DateText>
+                                                <FooterView>
+                                                    <VoteView>
+                                                        <VoteButton
+                                                            onPress={() => this.vote(post, 1)}
+                                                            underlayColor={postPressed}
+                                                        >
+                                                            <Image
+                                                                source={require("../../assets/icons/upIcon.png")}
+                                                                style={{
+                                                                    tintColor: this.setVoteButtonColor(post.postId, "like")
+                                                                }}
+                                                            />
+                                                        </VoteButton>
+                                                        <VoteText>{post.vote}   </VoteText>
+                                                        <VoteButton
+                                                            onPress={() => this.vote(post, -1)}
+                                                            underlayColor={postPressed}
+                                                        >
+                                                            <Image
+                                                                source={require("../../assets/icons/downIcon.png")}
+                                                                style={{
+                                                                    tintColor: this.setVoteButtonColor(post.postId, "dislike")
+                                                                }}
+                                                            />
+                                                        </VoteButton>
+                                                    </VoteView>
+                                                    <DateText>{dateConvert(post.timestamp)}</DateText>
+                                                </FooterView>
                                             </PostContentView>
                                         </PostView>
                                     </PostButton>
@@ -151,6 +201,12 @@ const DateText = glamorous.text({
     fontSize: noteFontSize,
     textAlign: 'right',
     paddingRight: postIndicatorWidth + contentsPaddingSides
+})
+
+const FooterView = glamorous.view({
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
 })
 
 const IconContainerView = glamorous.view({
@@ -211,11 +267,30 @@ const TitleText = glamorous.text({
     paddingRight: 20
 })
 
+const VoteButton = glamorous.touchableHighlight({
+    padding: contentsPaddingSides
+})
+
+const VoteText = glamorous.text({
+    fontWeight: 'bold',
+    paddingLeft: contentsPaddingSides
+})
+
+const VoteView = glamorous.view({
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
+})
+
 const mapStateToProps = (state) => {
     return ({
         user: state.user,
         posts: state.posts
     })
-};
+}
 
-export default connect(mapStateToProps)(Posts);
+const mapActionsToProps = {
+    onVote: votePost
+}
+
+export default connect(mapStateToProps, mapActionsToProps)(Posts);

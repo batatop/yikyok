@@ -34,7 +34,7 @@ class Login extends React.Component {
         return (
             <PostsView>
                 <TitleView>
-                    <TitleText>Yikyok </TitleText>
+                    <TitleText>New Yikyak  </TitleText>
                 </TitleView>
                 <PhoneView>
                     <PhoneInputText>Enter your phone number</PhoneInputText>

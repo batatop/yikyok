@@ -50,17 +50,18 @@ export function checkUser() {
 export function signIn(phoneNumber) {
     return (dispatch) => {
         firebase.auth().signInWithPhoneNumber(phoneNumber)
-            .then((result) => {
-                const codeInput = "111111" // Temp value
+            // TEST NUMBER CONFIRM
+            // .then((result) => {
+            //     const codeInput = "111111" // Temp value
 
-                if (result && codeInput.length) {
-                    result.confirm(codeInput)
-                        .catch((error) => {
-                            const { code, message } = error;
-                            console.log(message)
-                        })
-                }
-            })
+            //     if (result && codeInput.length) {
+            //         result.confirm(codeInput)
+            //             .catch((error) => {
+            //                 const { code, message } = error;
+            //                 console.log(message)
+            //             })
+            //     }
+            // })
             .catch((error) => {
                 const { code, message } = error;
                 console.log(message)
@@ -92,37 +93,49 @@ export function makePost(post) {
             timestamp: firebase.database.ServerValue.TIMESTAMP,
             title: post.title,
             content: post.content,
-            starCount: 0,
+            vote: 0,
             stars: {}
         })
     }
 }
 
-export function votePost(post, uid, upvote) {
+export function votePost(pid, uid, newVote) {
     return (dispatch) => {
-        let commentsRef = db.ref(`users/${uid}/votes/${post}`)
-        commentsRef.update({
-            vote: upvote
-        })
-        let voteRef = db.ref(`posts/${post}`)
-        voteRef.transaction(function (post) {
-            if (post) {
-                if (post.stars && post.stars[uid]) {
-                    post.starCount--;
-                    post.stars[uid] = null;
-                }
-                else {
-                    post.starCount++;
-                    if (!post.stars) {
-                        post.stars = {};
-                    }
-                    post.stars[uid] = true;
-                }
+        let userRef = db.ref(`users/${uid}`)
+        let postRef = db.ref(`posts/${pid}`)
+        
+        userRef.child('votes').child(pid).once('value').then( function(snap) {
+            let oldVote = 0
+            if (snap.val() != null) {
+                oldVote = snap.val().vote
             }
-            else {
-                console.log("asdjsd")
+
+            if (oldVote == newVote) {
+                newVote = 0
+                userRef.child('votes').child(pid).update({
+                    vote: newVote
+                })
+
+                let voteChange = (-1 * oldVote) + newVote
+                postRef.once("value").then(function (snap) {
+                    postRef.update({
+                        vote: snap.val().vote + voteChange
+                    })
+                })
             }
-            return post;
+
+            if(oldVote != newVote) {
+                userRef.child('votes').child(pid).update({
+                    vote: newVote
+                })
+                
+                let voteChange = (-1 * oldVote) + newVote
+                postRef.once("value").then( function(snap) {
+                    postRef.update({
+                        vote: snap.val().vote + voteChange
+                    })
+                })
+            }
         })
     }
 }
