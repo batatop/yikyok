@@ -3,8 +3,8 @@ import { View, Dimensions, Image, ScrollView } from "react-native"
 import { connect } from 'react-redux'
 import glamorous from 'glamorous-native'
 
-import { appBackground, secondary, secondaryDark, darkText, divider, postPressed, lightText, headerSelected } from "../../assets/styles/colors"
-import { newPostButtonSize, newPostButtonPadding, postFontSize, postPadding, postMinHeight, postBorderWidth } from "../../assets/styles/sizes";
+import { appBackground, secondary, secondaryDark, darkText, divider, postPressed, lightText, headerSelected, noteText } from "../../assets/styles/colors"
+import { newPostButtonSize, newPostButtonPadding, postFontSize, postPadding, postMinHeight, postBorderWidth, postIndicatorWidth, contentsPaddingSides, noteFontSize } from "../../assets/styles/sizes";
 
 function renderPosts(posts) {
     let array = []
@@ -15,6 +15,38 @@ function renderPosts(posts) {
     }
 
     return array
+}
+
+function dateConvert(timestamp) {
+
+    let days = Date.now() - timestamp
+    let d = days / 86400000
+    d = Math.floor(d)
+
+    if (d <= 0) {
+        //today
+        if (days < 3600000) {
+            if (days < 60000) {
+                return `Less than a minute ago`
+            }
+            let minutes = Math.floor(days / 60000)
+            return (`${minutes} minutes ago`)
+        }
+        //this hour
+        else {
+            return (`Today at ${new Date(timestamp).getHours()}:${new Date(timestamp).getMinutes()}`)
+        }
+
+    }
+    else if (d === 1) {
+        return (`Yesterday at ${new Date(timestamp).getHours()}:${new Date(timestamp).getMinutes()}`)
+    }
+    else {
+        return (`${d} days ago at ${new Date(timestamp).getHours()}:${new Date(timestamp).getMinutes()}`)
+    }
+
+    // hour = 3600000
+    // minute = 60000
 }
 
 class Posts extends React.Component {
@@ -80,7 +112,7 @@ class Posts extends React.Component {
                                             <PostContentView>
                                                 <TitleText>{post.title} </TitleText>
                                                 <ContentText>{post.content}</ContentText>
-                                                {/* <Text>{post.timestamp}{"\n"}</Text> */}
+                                                <DateText>{dateConvert(post.timestamp)}</DateText>
                                             </PostContentView>
                                         </PostView>
                                     </PostButton>
@@ -114,6 +146,13 @@ const ContentText = glamorous.text({
     paddingRight: postPadding
 })
 
+const DateText = glamorous.text({
+    color: noteText,
+    fontSize: noteFontSize,
+    textAlign: 'right',
+    paddingRight: postIndicatorWidth + contentsPaddingSides
+})
+
 const IconContainerView = glamorous.view({
     flexDirection: "row",
     flex: 1,
@@ -142,7 +181,8 @@ const PostButton = glamorous.touchableHighlight({
 })
 
 const PostContentView = glamorous.view({
-    justifyContent: 'center'
+    justifyContent: 'center',
+    width: Dimensions.get('window').width
 })
 
 const PostIndicatorView = glamorous.view({

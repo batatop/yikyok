@@ -1,11 +1,11 @@
 import React from "react"
 import { sendMessage } from '../../actions/authActions';
-import { Text, Dimensions, Image, ScrollView } from "react-native"
+import { Text, Dimensions, Image, ScrollView, View, TouchableHighlight } from "react-native"
 import { connect } from 'react-redux'
 import glamorous from 'glamorous-native'
 
-import { secondary, lightText, darkText, divider, appBackground, secondaryDark, secondaryLight, headerSelected } from "../../assets/styles/colors";
-import { postFontSize, postPadding, postMinHeight, postBorderWidth, singleCommentHeight, sendIconSize, sendIconBorderSize, postIndicatorWidth, singleCommentIndicatorWidth, commentsTextPaddingTop, contentsPaddingSides, inputHeight, iconPadding, commentsInputPaddingSides, inputTextboxBorderRadius, inputTextboxHeight, sendIconPadding } from "../../assets/styles/sizes";
+import { secondary, lightText, darkText, divider, appBackground, secondaryDark, secondaryLight, headerSelected, noteText, primaryLight } from "../../assets/styles/colors";
+import { postFontSize, postPadding, postMinHeight, postBorderWidth, singleCommentHeight, sendIconSize, sendIconBorderSize, postIndicatorWidth, singleCommentIndicatorWidth, commentsTextPaddingTop, contentsPaddingSides, inputHeight, iconPadding, commentsInputPaddingSides, inputTextboxBorderRadius, inputTextboxHeight, sendIconPadding, noteFontSize } from "../../assets/styles/sizes";
 
 function renderMessages(posts, postId) {
     let array = []
@@ -21,6 +21,37 @@ function renderMessages(posts, postId) {
         }
     }
     return array
+}
+
+function dateConvert(timestamp) {
+    let days = Date.now() - timestamp
+    let d = days / 86400000
+    d = Math.floor(d)
+
+    if (d <= 0) {
+        //today
+        if (days < 3600000) {
+            if (days < 60000) {
+                return `Less than a minute ago`
+            }
+            let minutes = Math.floor(days / 60000)
+            return (`${minutes} minutes ago`)
+        }
+        //this hour
+        else {
+            return (`Today at ${new Date(timestamp).getHours()}:${new Date(timestamp).getMinutes()}`)
+        }
+
+    }
+    else if (d === 1) {
+        return (`Yesterday at ${new Date(timestamp).getHours()}:${new Date(timestamp).getMinutes()}`)
+    }
+    else {
+        return (`${d} days ago at ${new Date(timestamp).getHours()}:${new Date(timestamp).getMinutes()}`)
+    }
+
+    // hour = 3600000
+    // minute = 60000
 }
 
 class Comments extends React.Component {
@@ -52,6 +83,7 @@ class Comments extends React.Component {
         }
         this.listMessages = this.listMessages.bind(this)
         this.submitMessage = this.submitMessage.bind(this)
+        this.vote = this.vote.bind(this)
     }
 
     listMessages(posts, postId) {
@@ -59,7 +91,8 @@ class Comments extends React.Component {
             <SingleCommentView key={`comment_${i}`}>
                 <SingleCommentIndicatorView />
                 <SingleCommentContentView>
-                    <SingleCommentText>{obj.comment}{"\n"}</SingleCommentText>
+                    <SingleCommentText>{obj.comment}</SingleCommentText>
+                    <DateText>{dateConvert(obj.timestamp)}</DateText>
                 </SingleCommentContentView>
             </SingleCommentView>
         )
@@ -68,23 +101,49 @@ class Comments extends React.Component {
     submitMessage() {
         this.props.onSendMessage(this.props.user.uid, this.props.navigation.state.params.postObj.postId, this.state.message)
     }
+
+    vote(num) {
+        // let pid = this.props.navigation.state.params.postObj.postId
+        // let upvoted
+        // if (this.props.user.votes && this.props.user.votes[pid])
+        //     upvoted = this.props.user.votes[pid].vote
+
+        // let voteState = 0
+
+        // if (upvoted != undefined) {
+        //     if (!(upvoted === num)) {
+        //         voteState = num
+        //     }
+        // }
+
+        // this.props.onVote(this.props.navigation.state.params.postObj.postId, this.props.user.uid, voteState)
+    }
     
     render() {
         let mark = this.props.navigation.state.params.postObj
         return (
             <CommentsView>
                 <ScrollView>
-                <PostView>
-                    <PostIndicatorView />
-                    <PostContentView>
-                        <TitleText>{mark.title}</TitleText>
-                        <ContentText>{mark.content}</ContentText>
-                    </PostContentView>
-                </PostView>
-                <CommentsTextView>
-                    <Text>Comments</Text>
-                </CommentsTextView>
-                { this.listMessages(this.props.posts, mark.postId) }
+                    <PostView>
+                        <PostIndicatorView />
+                        <PostContentView>
+                            <TitleText>{mark.title}</TitleText>
+                            <ContentText>{mark.content}</ContentText>
+                            <FooterView>
+                                <VoteButton
+                                    onPress={() => this.vote(1)}
+                                    underlayColor={headerSelected}
+                                >
+                                    <VoteImage source={require("../../assets/icons/upIcon.png")} />
+                                </VoteButton>
+                                <DateText>{dateConvert(mark.timestamp)}</DateText>
+                            </FooterView>
+                        </PostContentView>
+                    </PostView>
+                    <CommentsTextView>
+                        <Text>Comments</Text>
+                    </CommentsTextView>
+                    { this.listMessages(this.props.posts, mark.postId) }
                 </ScrollView>
                 <InputView>
                     <TextboxSide>
@@ -129,6 +188,19 @@ const ContentText = glamorous.text({
     paddingRight: contentsPaddingSides
 })
 
+const DateText = glamorous.text({
+    color: noteText,
+    fontSize: noteFontSize,
+    textAlign: 'right',
+    paddingRight: postIndicatorWidth + contentsPaddingSides
+})
+
+const FooterView = glamorous.view({
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+})
+
 const IconContainerView = glamorous.view({
     flexDirection: "row",
     flex: 1,
@@ -159,7 +231,8 @@ const PostView = glamorous.view({
 })
 
 const PostContentView = glamorous.view({
-    justifyContent: 'center'
+    justifyContent: 'center',
+    width: Dimensions.get('window').width
 })
 
 const PostIndicatorView = glamorous.view({
@@ -192,7 +265,8 @@ const SingleCommentView = glamorous.view({
 })
 
 const SingleCommentContentView = glamorous.view({
-    justifyContent: 'center'
+    justifyContent: 'center',
+    width: Dimensions.get('window').width
 })
 
 const SingleCommentIndicatorView = glamorous.view({
@@ -234,6 +308,14 @@ const TextboxSide = glamorous.view({
     flex: 0.85,
     height: inputHeight,
     justifyContent: "center",
+})
+
+const VoteButton = glamorous.touchableHighlight({
+    paddingLeft: contentsPaddingSides
+})
+
+const VoteImage = glamorous.image({
+    tintColor: primaryLight
 })
 
 const mapStateToProps = (state) => {

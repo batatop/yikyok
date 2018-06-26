@@ -5,17 +5,17 @@ var db = firebase.database();
 export function checkUser() {
     return (dispatch) => {
         firebase.auth().onAuthStateChanged((user) => {
-            if(user) {
+            if (user) {
                 let ref = db.ref(`users/${user.uid}`);
-                
+
                 ref.once('value', (snapshot) => {
-                    if(snapshot.val() == null) {
+                    if (snapshot.val() == null) {
                         ref.set({
                             uid: user.uid,
                             school: "noSchool",
                             history: {
                                 upvotes: 0,
-                                downwotes: 0
+                                downvotes: 0
                             }
                         })
                     }
@@ -52,7 +52,7 @@ export function signIn(phoneNumber) {
         firebase.auth().signInWithPhoneNumber(phoneNumber)
             .then((result) => {
                 const codeInput = "111111" // Temp value
-                
+
                 if (result && codeInput.length) {
                     result.confirm(codeInput)
                         .catch((error) => {
@@ -92,9 +92,42 @@ export function makePost(post) {
             timestamp: firebase.database.ServerValue.TIMESTAMP,
             title: post.title,
             content: post.content,
+            starCount: 0,
+            stars: {}
         })
     }
 }
+
+export function votePost(post, uid, upvote) {
+    return (dispatch) => {
+        let commentsRef = db.ref(`users/${uid}/votes/${post}`)
+        commentsRef.update({
+            vote: upvote
+        })
+        let voteRef = db.ref(`posts/${post}`)
+        voteRef.transaction(function (post) {
+            if (post) {
+                if (post.stars && post.stars[uid]) {
+                    post.starCount--;
+                    post.stars[uid] = null;
+                }
+                else {
+                    post.starCount++;
+                    if (!post.stars) {
+                        post.stars = {};
+                    }
+                    post.stars[uid] = true;
+                }
+            }
+            else {
+                console.log("asdjsd")
+            }
+            return post;
+        })
+    }
+}
+
+
 
 export function sendMessage(userId, post, message) {
     return (dispatch) => {
@@ -105,6 +138,7 @@ export function sendMessage(userId, post, message) {
             commentId: commentKey,
             comment: message,
             user: userId,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
         })
     }
 }
